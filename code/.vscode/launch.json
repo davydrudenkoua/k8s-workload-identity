@@ -1,0 +1,21 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python Debugger: Current File",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "env": {
+                "AZURE_STORAGE_CONNECTION_STRING": "DefaultEndpointsProtocol=https;AccountName=davydscats;AccountKey=j0DcTQgH2yb713JdU2pJnkCz+1RNYpuOEuO3YEAQ+ZWKgEyeT2wySVUkznBiMgkFe0k9MUU+CZ+E+ASt2PeX6g==;EndpointSuffix=core.windows.net",
+                "AZURE_STORAGE_ACCOUNT_KEY": "j0DcTQgH2yb713JdU2pJnkCz+1RNYpuOEuO3YEAQ+ZWKgEyeT2wySVUkznBiMgkFe0k9MUU+CZ+E+ASt2PeX6g==",
+                "AZURE_STORAGE_CONTAINER_NAME": "cats"
+
+              }
+        }
+    ]
+}
