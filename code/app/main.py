@@ -4,12 +4,15 @@ from models.users_cat import UsersCat
 from services.blob_storage_service import CatPicsStorageService
 from fastapi import FastAPI, HTTPException, UploadFile
 
-cat_pics = CatPicsStorageService()
 app = FastAPI()
 
+@app.get("/test")
+async def get_banner():
+    return {"service-name": "cats-api"}
 
 @app.get("/cat/{user}")
 async def get_users_cat_pic(user: str):
+    cat_pics = CatPicsStorageService()
     blob_url = cat_pics.get_readonly_url(blob="cat", path=user)
 
     if not blob_url:
@@ -20,6 +23,7 @@ async def get_users_cat_pic(user: str):
 
 @app.post("/cat/{user}")
 async def upload_users_cat_pic(user: str, file: UploadFile):
+    cat_pics = CatPicsStorageService()
     content = await file.read()
     result = cat_pics.upload_pic(
         path=user, blob="cat", file=BytesIO(content), content_type=file.content_type
