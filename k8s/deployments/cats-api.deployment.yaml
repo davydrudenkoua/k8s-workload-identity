@@ -13,7 +13,9 @@ spec:
     metadata:
       labels:
         app:  cats-api
+        azure.workload.identity/use: "true"
     spec:
+      serviceAccountName: {{SERVICE_ACCOUNT_NAME}}
       containers:
       - name:  cats-api
         image:  davydrudenkoua/cats-api:latest
