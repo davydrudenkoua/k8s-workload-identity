@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cats-api-deployment
+  labels:
+    app: cats-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cats-api
+  template:
+    metadata:
+      labels:
+        app:  cats-api
+    spec:
+      containers:
+      - name:  cats-api
+        image:  davydrudenkoua/cats-api:latest
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+          limits:
+            cpu: 100m
+            memory: 100Mi
+      imagePullSecrets:
+        - name: cats-api-registry-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cats-api-nodeport
+  labels:
+    app: cats-api
+spec:
+  selector:
+    app: cats-api
+  type: NodePort
+  ports:
+  - name: cats-api
+    protocol: TCP
+    port: 8080
+    targetPort: 80
