@@ -1,7 +1,7 @@
 function CreateK8SWorkloadIdentity {
     $ResourceGroup = "k8s-to-blobstorage"
     $Location = "polandcentral"
-    $ClusterName = "awi-k8s-cluster"
+    $ClusterName = "cats-api-k8s"
     $ServiceAccountNamespace = "default"
     $ServiceAccountName="cats-api-sa"
     $SubscriptionId = $(az account show --query "id" --output tsv)
@@ -21,9 +21,9 @@ function CreateK8SWorkloadIdentity {
         --enable-workload-identity `
         --generate-ssh-keys `
         --location $Location `
-        --node-vm-size "Standard_B2ats_v2" `
+        --node-vm-size "Standard_B2s" `
         --node-count 1 `
-        ---tier free `
+        --tier "free"
 
     $AksOidcIssuer = $(
         az aks show --name $ClusterName --resource-group $ResourceGroup --query "oidcIssuerProfile.issuerUrl" --output tsv
@@ -31,14 +31,14 @@ function CreateK8SWorkloadIdentity {
     $UserAssignedClientId = $(
         az identity show --name $UserAssignedIdentityName --resource-group $ResourceGroup --query "clientId" --output tsv
     )
-    az aks get credentials --name $ClusterName --resource-group $ResourceGroup
+    az aks get-credentials --name $ClusterName --resource-group $ResourceGroup
     
-    $ServiceAccountTemplate = Get-Content -Path "serviceAccounts/cats-api.serviceAccount.yaml" -Raw `
-        -replace "{{USER_ASSIGNED_CLIENT_ID}}", $UserAssignedClientId `
-        -replace "{{SERVICE_ACCOUNT_NAME}}", $ServiceAccountName `
-        -replace "{{SERVICE_ACCOUNT_NAMESPACE}}", $ServiceAccountNamespace
+    $ServiceAccountTemplate = Get-Content -Path "k8s/serviceAccounts/cats-api.serviceAccount.yaml" -Raw
+    $ServiceAccountTemplate = $ServiceAccountTemplate -replace "{{USER_ASSIGNED_CLIENT_ID}}", $UserAssignedClientId
+    $ServiceAccountTemplate = $ServiceAccountTemplate -replace "{{SERVICE_ACCOUNT_NAME}}", $ServiceAccountName
+    $ServiceAccountTemplate = $ServiceAccountTemplate -replace "{{SERVICE_ACCOUNT_NAMESPACE}}", $ServiceAccountNamespace
     $ServiceAccountTemplate | kubectl apply -f -
-    
+
     az identity federated-credential create `
         --name $FederatedIdentityCredentialName `
         --identity-name $UserAssignedIdentityName `
@@ -47,8 +47,8 @@ function CreateK8SWorkloadIdentity {
         --subject "system:serviceaccount:${ServiceAccountNamespace}:${ServiceAccountName}" `
         --audience "api://AzureADTokenExchange"
 
-    $DeploymentTemplate = Get-Content -Path "deployments/cats-api.deployment.yaml" -Raw `
-        -replace "{{SERVICE_ACCOUNT_NAME}}", $ServiceAccountName
+    $DeploymentTemplate = Get-Content -Path "k8s/deployments/cats-api.deployment.yaml" -Raw
+    $DeploymentTemplate = $DeploymentTemplate -replace "{{SERVICE_ACCOUNT_NAME}}", $ServiceAccountName
     $DeploymentTemplate | kubectl apply -f -
 
     $StorageAccountId = $(
@@ -70,5 +70,6 @@ function CreateK8SWorkloadIdentity {
         --role "Storage Blob Data Contributor" `
         --scope $StorageAccountId `
         --assignee-principal-type "ServicePrincipal"
-    
 }
+
+CreateK8SWorkloadIdentity
