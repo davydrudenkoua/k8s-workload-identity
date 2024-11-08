@@ -32,13 +32,13 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: cats-api-nodeport
+  name: cats-api-loadbalancer
   labels:
     app: cats-api
 spec:
   selector:
     app: cats-api
-  type: NodePort
+  type: LoadBalancer
   ports:
   - name: cats-api
     protocol: TCP
