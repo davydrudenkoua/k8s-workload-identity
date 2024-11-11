@@ -6,7 +6,7 @@ from fastapi import FastAPI, HTTPException, UploadFile
 
 app = FastAPI()
 
-@app.get("/test")
+@app.get("/service")
 async def get_banner():
     return {"service-name": "cats-api"}
 
