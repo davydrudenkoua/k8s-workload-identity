@@ -15,6 +15,29 @@ function CreateK8SWorkloadIdentity {
         --location $Location `
         --subscription $SubscriptionId
     Write-Host "Identity $UserAssignedIdentityName created"
+    Write-Host "Creating `"Storage Blob Data Contributor`" Role Assignment for $UserAssignedIdentityName identity..."
+    $IdentityPrincipalId = $(
+        az identity show `
+        --name $UserAssignedIdentityName `
+        --resource-group $ResourceGroup `
+        --query "principalId" `
+        --output tsv
+    )
+
+    $StorageAccountId = $(
+        az storage account show `
+            --resource-group $ResourceGroup `
+            --name "davydscats" `
+            --query "id" `
+            --output tsv
+    )
+
+    az role assignment create `
+        --assignee-object-id $IdentityPrincipalId `
+        --role "Storage Blob Data Contributor" `
+        --scope $StorageAccountId `
+        --assignee-principal-type "ServicePrincipal"
+    Write-Host "Role Assignment created"
 
     Write-Host "Creating AKS $ClusterName..."
     az aks create `
@@ -68,28 +91,6 @@ function CreateK8SWorkloadIdentity {
     $DeploymentTemplate = $DeploymentTemplate -replace "{{SERVICE_ACCOUNT_NAME}}", $ServiceAccountName
     Write-Host "API deployment to be applied:`n$DeploymentTemplate"
     $DeploymentTemplate | kubectl apply -f -
-
-    $StorageAccountId = $(
-        az storage account show `
-        --resource-group $ResourceGroup `
-        --name "davydscats" `
-        --query "id" `
-        --output tsv
-    )
-    $IdentityPrincipalId = $(
-        az identity show `
-        --name $UserAssignedIdentityName `
-        --resource-group $ResourceGroup `
-        --query "principalId" `
-        --output tsv
-    )
-
-    Write-Host "Creating `"Storage Blob Data Contributor`" role assignment for storage account..."
-    az role assignment create `
-        --assignee-object-id $IdentityPrincipalId `
-        --role "Storage Blob Data Contributor" `
-        --scope $StorageAccountId `
-        --assignee-principal-type "ServicePrincipal"
 }
 
 CreateK8SWorkloadIdentity

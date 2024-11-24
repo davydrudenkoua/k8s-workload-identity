@@ -2,18 +2,12 @@ import os
 import io
 from datetime import datetime, timedelta, timezone
 from azure.identity import DefaultAzureCredential
-from azure.storage.blob import (
-    BlobServiceClient,
-    generate_blob_sas,
-    BlobSasPermissions,
-    ContentSettings,    
-)
-
+from azure.storage.blob import BlobServiceClient
 
 class CatPicsStorageService:
     def __init__(self):
-        self.container_name = "cats"#os.getenv("AZURE_STORAGE_CONTAINER_NAME")
-        self.account_name = "davydscats"#os.getenv("AZURE_STORAGE_ACCOUNT_NAME")
+        self.container_name = "cats"
+        self.account_name = "davydscats"
 
         self.blob_service_client = BlobServiceClient(
             account_url=f"https://{self.account_name}.blob.core.windows.net",
