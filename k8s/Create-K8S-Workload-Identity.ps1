@@ -18,10 +18,10 @@ function CreateK8SWorkloadIdentity {
     Write-Host "Creating `"Storage Blob Data Contributor`" Role Assignment for $UserAssignedIdentityName identity..."
     $IdentityPrincipalId = $(
         az identity show `
-        --name $UserAssignedIdentityName `
-        --resource-group $ResourceGroup `
-        --query "principalId" `
-        --output tsv
+            --name $UserAssignedIdentityName `
+            --resource-group $ResourceGroup `
+            --query "principalId" `
+            --output tsv
     )
 
     $StorageAccountId = $(
@@ -63,9 +63,9 @@ function CreateK8SWorkloadIdentity {
     Write-Host "AKS credentials saved"
 
     kubectl create secret docker-registry cats-api-registry-secret `
-    --docker-server=https://index.docker.io/v1/ `
-    --docker-username=$Env:DOCKER_USERNAME `
-    --docker-password=$Env:DOCKER_PASSWORD
+        --docker-server=https://index.docker.io/v1/ `
+        --docker-username=$Env:DOCKER_USERNAME `
+        --docker-password=$Env:DOCKER_PASSWORD
     Write-Host "AKS secret for pulling image created"
 
     Write-Host "Creating service account deployment..."
